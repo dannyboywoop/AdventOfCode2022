@@ -7,7 +7,7 @@ project Day_01 is
    for Main use ("main.adb");
 
    package Compiler is
-      for Switches ("ada") use ("-gnat2022");
+      for Default_Switches ("ada") use ("-gnat2022");
    end Compiler;
 
 end Day_01;
