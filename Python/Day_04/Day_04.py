@@ -21,7 +21,14 @@ def read_data(input_file="input.txt"):
     return range_pairs
 
 
-def find_redundant_elves(range_pairs):
+def count_partially_redundant_elves(range_pairs):
+    count = 0
+    for range_1, range_2 in range_pairs:
+        count += range_1.upper >= range_2.lower and range_2.upper >= range_1.lower
+    return count
+
+
+def count_totally_redundant_elves(range_pairs):
     count = 0
     for range_1, range_2 in range_pairs:
         if range_1.lower == range_2.lower:
@@ -40,9 +47,10 @@ if __name__ == "__main__":
     print("Input parsed!")
     timer.checkpoint_hit()
 
-    print(f"Star_01: {find_redundant_elves(range_pairs)}")
+    print(f"Star_01: {count_totally_redundant_elves(range_pairs)}")
     timer.checkpoint_hit()
 
+    print(f"Star_02: {count_partially_redundant_elves(range_pairs)}")
     timer.checkpoint_hit()
 
     timer.end_hit()
