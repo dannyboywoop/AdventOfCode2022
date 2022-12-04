@@ -24,10 +24,14 @@ Here is the current status of my solutions:
 
 | Day | Star | Solved in Python | Solved in Ada | Level of SPARK use |
 | --- | ---- | ---------------- | ------------- | ------------------ |
-| 01 | 01 | Yes | Yes | Bronze |
-| 01 | 02 | Yes | No | N/A |
+| 01 | 01 | Yes | Yes | Gold |
+| 01 | 02 | Yes | Yes | Silver |
 | 02 | 01 | Yes | No | N/A |
 | 02 | 02 | Yes | No | N/A |
+| 03 | 01 | Yes | No | N/A |
+| 03 | 02 | Yes | No | N/A |
+| 04 | 01 | Yes | No | N/A |
+| 04 | 02 | Yes | No | N/A |
 
 Some python solutions will import modules from my aoc_tools package, you will need to install this using:
 ```pip install aoc-tools-dannyboywoop```

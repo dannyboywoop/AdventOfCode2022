@@ -36,6 +36,9 @@ is
    --     (Count_Zero_Length_Strings'Result <= Up_To_Idx - Strings'First + 1),
       --     Subprogram_Variant => (Decreases => Up_To_Idx);
 
+   function Find_Max_3_Calories
+     (Calories_Arr : Elf_Calories_Arr) return Base_Calories_T;
+
    function Count_Zero_Length_Strings
      (Strings : Str_Arr; Up_To_Idx : Natural) return Natural is
      (if Up_To_Idx < Strings'First then 0

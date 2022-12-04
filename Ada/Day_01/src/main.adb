@@ -9,4 +9,5 @@ procedure Main with SPARK_Mode is
    calories_arr : Elf_Calories_Arr:=Count_Calories(items);
 begin
    Put_Line(Find_Max_Calories(calories_arr)'Image);
+   Put_Line(Find_Max_3_Calories(calories_arr)'Image);
 end Main;
