@@ -18,10 +18,10 @@ package body Rock_Paper_Scissors with SPARK_Mode is
    function Calculate_Total_Score(Move_Pairs: Move_Pair_Arr) return Score_T is
       Total : Score_T := 0;
    begin
-      for Move_Pair of Move_Pairs loop
-         Total := @ + Calculate_Turn_Score(Move_Pair);
+      for Idx in Move_Pairs'Range loop
+         Total := @ + Calculate_Turn_Score(Move_Pairs(Idx));
+         pragma Loop_Invariant(Total <= Score_T(Idx) * Turn_Score_T'Last);
       end loop;
       return Total;
    end;
-
 end Rock_Paper_Scissors;
