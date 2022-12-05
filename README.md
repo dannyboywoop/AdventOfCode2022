@@ -26,12 +26,14 @@ Here is the current status of my solutions:
 | --- | ---- | ---------------- | ------------- | ------------------ |
 | 01 | 01 | Yes | Yes | Gold |
 | 01 | 02 | Yes | Yes | Silver |
-| 02 | 01 | Yes | No | N/A |
+| 02 | 01 | Yes | Yes | Silver |
 | 02 | 02 | Yes | No | N/A |
 | 03 | 01 | Yes | No | N/A |
 | 03 | 02 | Yes | No | N/A |
 | 04 | 01 | Yes | No | N/A |
 | 04 | 02 | Yes | No | N/A |
+| 05 | 01 | Yes | No | N/A |
+| 05 | 02 | Yes | No | N/A |
 
 Some python solutions will import modules from my aoc_tools package, you will need to install this using:
 ```pip install aoc-tools-dannyboywoop```
