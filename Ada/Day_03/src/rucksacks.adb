@@ -45,6 +45,7 @@ package body Rucksacks with SPARK_Mode is
    begin
       for Idx in Items'Range loop
          Total := @ + Get_Value(Items(Idx));
+         pragma Loop_Invariant(Total <= Base_Value_T(Idx) * Item_Value_T'Last);
       end loop;
       return Total;
    end;
