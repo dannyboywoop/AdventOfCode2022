@@ -1,3 +1,4 @@
+from __future__ import annotations
 from re import compile as comp
 from dataclasses import dataclass, field
 from typing import Optional
@@ -10,7 +11,7 @@ LS_COMMAND_REGEX = comp(r"\$ ls")
 DIR_REGEX = comp(r"dir (?P<dir>[\w\/]+)")
 FILE_REGEX = comp(r"(?P<size>\d+) (?P<name>[\w\.]+)")
 
-DIRECTORIES = {}
+DIRECTORIES: dict[str, Directory] = {}
 
 
 @dataclass
@@ -22,14 +23,14 @@ class File:
 @dataclass
 class Directory:
     files: list[File] = field(default_factory=list)
-    subdirectories: list[str] = field(default_factory=list)
+    sub_dir_names: list[str] = field(default_factory=list)
     _size: Optional[int] = None
 
     @property
     def size(self):
         if self._size is None:
             self._size = sum(file.size for file in self.files)
-            self._size += sum(DIRECTORIES[directory].size for directory in self.subdirectories)
+            self._size += sum(DIRECTORIES[sub_dir_name].size for sub_dir_name in self.sub_dir_names)
 
         return self._size
 
@@ -56,7 +57,7 @@ def parse_terminal_output(terminal_output):
                     DIRECTORIES[dir_name] = Directory()
 
         elif match := DIR_REGEX.match(line):
-            DIRECTORIES[current_dir[-1]].subdirectories.append(match["dir"])
+            DIRECTORIES[current_dir[-1]].sub_dir_names.append(match["dir"])
 
         elif match := FILE_REGEX.match(line):
             DIRECTORIES[current_dir[-1]].files.append(File(match["name"], int(match["size"])))
