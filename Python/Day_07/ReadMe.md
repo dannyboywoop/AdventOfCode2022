@@ -1,4 +1,4 @@
-# Day 07: [No Space Left On Device](https://adventofcode.com/2022/day/07)
+# Day 07: [No Space Left On Device](https://adventofcode.com/2022/day/7)
 ## Problem Definition
 You can hear birds chirping and raindrops hitting leaves as the expedition proceeds. Occasionally, you can even hear much louder sounds in the distance; how big do the animals get out here, anyway?
 
