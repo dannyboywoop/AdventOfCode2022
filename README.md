@@ -28,8 +28,8 @@ Here is the current status of my solutions:
 | 01 | 02 | Yes | Yes | Silver |
 | 02 | 01 | Yes | Yes | Silver |
 | 02 | 02 | Yes | Yes | Silver |
-| 03 | 01 | Yes | No | N/A |
-| 03 | 02 | Yes | No | N/A |
+| 03 | 01 | Yes | Yes | Silver |
+| 03 | 02 | Yes | Yes | Bronze |
 | 04 | 01 | Yes | No | N/A |
 | 04 | 02 | Yes | No | N/A |
 | 05 | 01 | Yes | No | N/A |
