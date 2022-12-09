@@ -1,7 +1,7 @@
 from __future__ import annotations
 from re import compile as comp
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, Tuple
 
 from aoc_tools import Advent_Timer
 
@@ -11,7 +11,7 @@ LS_COMMAND_REGEX = comp(r"\$ ls")
 DIR_REGEX = comp(r"dir (?P<dir>[\w\/]+)")
 FILE_REGEX = comp(r"(?P<size>\d+) (?P<name>[\w\.]+)")
 
-DIRECTORIES: dict[str, Directory] = {}
+DIRECTORIES: dict[Tuple[str, ...], Directory] = {}
 
 
 @dataclass
@@ -23,14 +23,14 @@ class File:
 @dataclass
 class Directory:
     files: list[File] = field(default_factory=list)
-    sub_dir_names: list[str] = field(default_factory=list)
+    sub_dir_paths: list[Tuple[str, ...]] = field(default_factory=list)
     _size: Optional[int] = None
 
     @property
     def size(self):
         if self._size is None:
             self._size = sum(file.size for file in self.files)
-            self._size += sum(DIRECTORIES[sub_dir_name].size for sub_dir_name in self.sub_dir_names)
+            self._size += sum(DIRECTORIES[sub_dir_name].size for sub_dir_name in self.sub_dir_paths)
 
         return self._size
 
@@ -42,7 +42,7 @@ def read_data(input_file="input.txt"):
 
 
 def parse_terminal_output(terminal_output):
-    current_dir = []
+    current_path = []
     for line in terminal_output:
         if match := LS_COMMAND_REGEX.match(line):
             continue  # do nothing
@@ -50,17 +50,19 @@ def parse_terminal_output(terminal_output):
         if match := CD_COMMAND_REGEX.match(line):
             dir_name = match["dir"]
             if dir_name == "..":
-                current_dir.pop()
+                current_path.pop()
             else:
-                current_dir.append(dir_name)
-                if dir_name not in DIRECTORIES:
-                    DIRECTORIES[dir_name] = Directory()
+                current_path.append(dir_name)
+                if tuple(current_path) not in DIRECTORIES:
+                    DIRECTORIES[tuple(current_path)] = Directory()
 
         elif match := DIR_REGEX.match(line):
-            DIRECTORIES[current_dir[-1]].sub_dir_names.append(match["dir"])
+            DIRECTORIES[tuple(current_path)].sub_dir_paths.append(
+                tuple(current_path + [match["dir"]])
+            )
 
         elif match := FILE_REGEX.match(line):
-            DIRECTORIES[current_dir[-1]].files.append(File(match["name"], int(match["size"])))
+            DIRECTORIES[tuple(current_path)].files.append(File(match["name"], int(match["size"])))
 
 
 def star_1(terminal_output, max_size=100000):
