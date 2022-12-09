@@ -11,6 +11,9 @@ LS_COMMAND_REGEX = comp(r"\$ ls")
 DIR_REGEX = comp(r"dir (?P<dir>[\w\/]+)")
 FILE_REGEX = comp(r"(?P<size>\d+) (?P<name>[\w\.]+)")
 
+DISK_SIZE = 70000000
+FREE_SPACE_REQUIRED = 30000000
+
 DIRECTORIES: dict[Tuple[str, ...], Directory] = {}
 
 
@@ -30,7 +33,7 @@ class Directory:
     def size(self):
         if self._size is None:
             self._size = sum(file.size for file in self.files)
-            self._size += sum(DIRECTORIES[sub_dir_name].size for sub_dir_name in self.sub_dir_paths)
+            self._size += sum(DIRECTORIES[sub_dir_path].size for sub_dir_path in self.sub_dir_paths)
 
         return self._size
 
@@ -74,6 +77,15 @@ def star_1(terminal_output, max_size=100000):
     return total
 
 
+def star_2():
+    best_option = DISK_SIZE
+    space_to_free = FREE_SPACE_REQUIRED + DIRECTORIES[tuple("/")].size - DISK_SIZE
+    for directory in DIRECTORIES.values():
+        if directory.size >= space_to_free:
+            best_option = min(best_option, directory.size)
+    return best_option
+
+
 if __name__ == "__main__":
     timer = Advent_Timer()
 
@@ -84,6 +96,7 @@ if __name__ == "__main__":
     print(f"Star_01: {star_1(terminal_output)}")
     timer.checkpoint_hit()
 
+    print(f"Star_02: {star_2()}")
     timer.checkpoint_hit()
 
     timer.end_hit()
