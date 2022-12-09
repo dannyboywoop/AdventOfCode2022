@@ -1,4 +1,3 @@
-from dataclasses import dataclass, field
 from typing import NamedTuple
 
 from aoc_tools import Advent_Timer
@@ -30,23 +29,26 @@ MOVE = {
 }
 
 
-@dataclass
 class Rope:
-    head: Point = Point()
-    tail: Point = Point()
-    previous_tail_positions: set[Point] = field(default_factory=lambda: set([Point()]))
+    def __init__(self, number_of_knots):
+        self.knots: list[Point] = [Point() for _ in range(number_of_knots)]
+        self.tail_history: set[Point] = set([Point()])
 
     def move_head(self, instruction):
         direction, distance = instruction
         for _ in range(distance):
-            self.head = MOVE[direction](self.head)
-            self._update_tail()
+            self.knots[0] = MOVE[direction](self.knots[0])
+            self._update_knots()
 
-    def _update_tail(self):
-        tail_to_head = self.head - self.tail
-        if abs(tail_to_head.x) > 1 or abs(tail_to_head.y) > 1:
-            self.tail += tail_to_head.normalize()
-            self.previous_tail_positions.add(self.tail)
+    def _update_knots(self):
+        for i in range(1, len(self.knots)):
+            self._update_knot(front_index=i - 1, back_index=i)
+        self.tail_history.add(self.knots[-1])
+
+    def _update_knot(self, front_index, back_index):
+        back_to_front = self.knots[front_index] - self.knots[back_index]
+        if abs(back_to_front.x) > 1 or abs(back_to_front.y) > 1:
+            self.knots[back_index] += back_to_front.normalize()
 
 
 def read_data(input_file="input.txt"):
@@ -55,11 +57,11 @@ def read_data(input_file="input.txt"):
     return data
 
 
-def star_01(instructions):
-    rope = Rope()
+def perform_instructions(instructions, number_of_knots=2):
+    rope = Rope(number_of_knots)
     for instruction in instructions:
         rope.move_head(instruction)
-    return len(rope.previous_tail_positions)
+    return len(rope.tail_history)
 
 
 if __name__ == "__main__":
@@ -69,9 +71,10 @@ if __name__ == "__main__":
     print("Input parsed!")
     timer.checkpoint_hit()
 
-    print(f"Star_01: {star_01(instructions)}")
+    print(f"Star_01: {perform_instructions(instructions)}")
     timer.checkpoint_hit()
 
+    print(f"Star_02: {perform_instructions(instructions, 10)}")
     timer.checkpoint_hit()
 
     timer.end_hit()
