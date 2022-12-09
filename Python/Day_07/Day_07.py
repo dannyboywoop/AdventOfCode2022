@@ -1,7 +1,7 @@
 from __future__ import annotations
 from re import compile as comp
 from dataclasses import dataclass, field
-from typing import Optional, Tuple
+from typing import Optional
 
 from aoc_tools import Advent_Timer
 
@@ -14,7 +14,7 @@ FILE_REGEX = comp(r"(?P<size>\d+) (?P<name>[\w\.]+)")
 DISK_SIZE = 70000000
 FREE_SPACE_REQUIRED = 30000000
 
-DIRECTORIES: dict[Tuple[str, ...], Directory] = {}
+DIRECTORIES: dict[str, Directory] = {}
 
 
 @dataclass
@@ -26,7 +26,7 @@ class File:
 @dataclass
 class Directory:
     files: list[File] = field(default_factory=list)
-    sub_dir_paths: list[Tuple[str, ...]] = field(default_factory=list)
+    sub_dir_paths: list[str] = field(default_factory=list)
     _size: Optional[int] = None
 
     @property
@@ -46,6 +46,7 @@ def read_data(input_file="input.txt"):
 
 def parse_terminal_output(terminal_output):
     current_path = []
+    current_path_str = ""
     for line in terminal_output:
         if match := LS_COMMAND_REGEX.match(line):
             continue  # do nothing
@@ -56,16 +57,15 @@ def parse_terminal_output(terminal_output):
                 current_path.pop()
             else:
                 current_path.append(dir_name)
-                if tuple(current_path) not in DIRECTORIES:
-                    DIRECTORIES[tuple(current_path)] = Directory()
+                current_path_str = "/".join(current_path)
+                if current_path_str not in DIRECTORIES:
+                    DIRECTORIES[current_path_str] = Directory()
 
         elif match := DIR_REGEX.match(line):
-            DIRECTORIES[tuple(current_path)].sub_dir_paths.append(
-                tuple(current_path + [match["dir"]])
-            )
+            DIRECTORIES[current_path_str].sub_dir_paths.append(f"{current_path_str}/{match['dir']}")
 
         elif match := FILE_REGEX.match(line):
-            DIRECTORIES[tuple(current_path)].files.append(File(match["name"], int(match["size"])))
+            DIRECTORIES[current_path_str].files.append(File(match["name"], int(match["size"])))
 
 
 def star_1(terminal_output, max_size=100000):
@@ -79,7 +79,7 @@ def star_1(terminal_output, max_size=100000):
 
 def star_2():
     best_option = DISK_SIZE
-    space_to_free = FREE_SPACE_REQUIRED + DIRECTORIES[tuple("/")].size - DISK_SIZE
+    space_to_free = FREE_SPACE_REQUIRED + DIRECTORIES["/"].size - DISK_SIZE
     for directory in DIRECTORIES.values():
         if directory.size >= space_to_free:
             best_option = min(best_option, directory.size)
