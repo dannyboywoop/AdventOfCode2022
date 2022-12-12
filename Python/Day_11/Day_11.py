@@ -1,6 +1,7 @@
 from re import compile as comp
 from copy import deepcopy
 from math import lcm
+from collections import deque
 
 from aoc_tools import Advent_Timer
 
@@ -41,9 +42,9 @@ class Monkey:
         (_, starting_line, operation_line, test_line, if_true_line, if_false_line) = [
             string.strip() for string in input_string.split("\n")
         ]
-        self.items = [
+        self.items = deque(
             int(item) for item in STARTING_REGEX.match(starting_line)["items"].split(", ")
-        ]
+        )
         self.operation = lambda x: eval(
             OPERATION_REGEX.match(operation_line)["op"], None, {"old": x}
         )
@@ -56,10 +57,9 @@ class Monkey:
         self.inspection_count = 0
 
     def inspect_items(self):
-        for item in self.items:
-            self._inspect_item(item)
+        while self.items:
+            self._inspect_item(self.items.popleft())
             self.inspection_count += 1
-        self.items.clear()
 
     def _inspect_item(self, value):
         value = self.operation(value)
