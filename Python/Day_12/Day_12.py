@@ -4,7 +4,7 @@ from typing import Tuple, TypeAlias
 
 from aoc_tools import Advent_Timer
 
-from a_star import find_best_path
+from shortest_path import find_best_path
 
 
 ORD_OFFSET = ord("a")
@@ -15,16 +15,18 @@ Position: TypeAlias = Tuple[int, int]
 @dataclass
 class Vertex:
     height: int
-    neighbours: list[Position] = field(default_factory=list)
+    neighbours: list[Position] = None
 
 
-def populate_neighbours(vertices):
+def populate_neighbours(vertices, reverse=False):
     for position in vertices:
+        vertices[position].neighbours = []
         for direction in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
             test_position = tuple(map(add, position, direction))
             if test_position not in vertices:
                 continue
-            if vertices[test_position].height <= vertices[position].height + 1:
+            climb = vertices[test_position].height - vertices[position].height
+            if (not reverse and climb <= 1) or (reverse and climb >= -1):
                 vertices[position].neighbours.append(test_position)
 
 
@@ -52,20 +54,9 @@ def prepare_vertices(char_map):
     return vertices, start, end
 
 
-def star_1(vertices, start, end):
-    best_path = find_best_path(vertices, start, end)
-    return len(best_path) - 1
-
-
 def star_2(vertices, end):
-    shortest_path = len(vertices)
-    for position, vertex in vertices.items():
-        if vertex.height > 0:
-            continue
-        new_path = find_best_path(vertices, position, end)
-        if new_path:
-            shortest_path = min(shortest_path, len(new_path))
-    return shortest_path - 1
+    populate_neighbours(vertices, reverse=True)
+    return find_best_path(vertices, end, lambda pos: vertices[pos].height == 0)
 
 
 if __name__ == "__main__":
@@ -76,7 +67,7 @@ if __name__ == "__main__":
     print("Input parsed!")
     timer.checkpoint_hit()
 
-    print(f"Star_1: {star_1(vertices, start, end)}")
+    print(f"Star_1: {find_best_path(vertices, start, lambda pos: pos==end)}")
     timer.checkpoint_hit()
 
     print(f"Star_2: {star_2(vertices, end)}")
