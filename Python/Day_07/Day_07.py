@@ -1,7 +1,7 @@
 from __future__ import annotations
 from re import compile as comp
 from dataclasses import dataclass, field
-from typing import Optional
+from functools import cached_property
 
 from aoc_tools import Advent_Timer
 
@@ -27,15 +27,12 @@ class File:
 class Directory:
     files: list[File] = field(default_factory=list)
     sub_dir_paths: list[str] = field(default_factory=list)
-    _size: Optional[int] = None
 
-    @property
+    @cached_property
     def size(self):
-        if self._size is None:
-            self._size = sum(file.size for file in self.files)
-            self._size += sum(DIRECTORIES[sub_dir_path].size for sub_dir_path in self.sub_dir_paths)
-
-        return self._size
+        size = sum(file.size for file in self.files)
+        size += sum(DIRECTORIES[sub_dir_path].size for sub_dir_path in self.sub_dir_paths)
+        return size
 
 
 def read_data(input_file="input.txt"):
