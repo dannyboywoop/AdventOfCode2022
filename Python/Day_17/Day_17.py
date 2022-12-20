@@ -1,5 +1,4 @@
-from typing import NamedTuple, Tuple
-from functools import cache
+from typing import NamedTuple
 
 from aoc_tools import Advent_Timer
 
@@ -12,27 +11,48 @@ class Point(NamedTuple):
         return Point(self.x + other.x, self.y + other.y)
 
 
+class RockShape:
+    def __init__(self, *points):
+        self.points = points
+        self.left_edge = min(point.x for point in points)
+        self.right_edge = max(point.x for point in points)
+        self.bottom_edge = min(point.y for point in points)
+        self.top_edge = max(point.y for point in points)
+
+
 ROCK_SHAPES = [
-    (Point(0, 0), Point(1, 0), Point(2, 0), Point(3, 0)),
-    (Point(1, 0), Point(0, 1), Point(1, 1), Point(2, 1), Point(1, 2)),
-    (Point(0, 0), Point(1, 0), Point(2, 0), Point(2, 1), Point(2, 2)),
-    (Point(0, 0), Point(0, 1), Point(0, 2), Point(0, 3)),
-    (Point(0, 0), Point(0, 1), Point(1, 0), Point(1, 1)),
+    RockShape(Point(0, 0), Point(1, 0), Point(2, 0), Point(3, 0)),
+    RockShape(Point(1, 0), Point(0, 1), Point(1, 1), Point(2, 1), Point(1, 2)),
+    RockShape(Point(0, 0), Point(1, 0), Point(2, 0), Point(2, 1), Point(2, 2)),
+    RockShape(Point(0, 0), Point(0, 1), Point(0, 2), Point(0, 3)),
+    RockShape(Point(0, 0), Point(0, 1), Point(1, 0), Point(1, 1)),
 ]
 
 
 class Rock:
-    def __init__(self, shape: Tuple[Point], origin: Point):
+    def __init__(self, shape: RockShape, origin: Point):
         self.shape = shape
         self.origin = origin
 
     @property
     def points(self):
-        return self.offset_points(self.origin)
+        return {point + self.origin for point in self.shape.points}
 
-    @cache
-    def offset_points(self, offset):
-        return {point + offset for point in self.shape}
+    @property
+    def left_edge(self):
+        return self.shape.left_edge + self.origin.x
+
+    @property
+    def right_edge(self):
+        return self.shape.right_edge + self.origin.x
+
+    @property
+    def bottom_edge(self):
+        return self.shape.bottom_edge + self.origin.y
+
+    @property
+    def top_edge(self):
+        return self.shape.top_edge + self.origin.y
 
 
 class Chamber:
@@ -45,7 +65,7 @@ class Chamber:
         self.wind = wind
         self.wind_index = 0
         self.max_height = 0
-        self.occupied_spots = set()
+        self.occupied_points = set()
 
     def wind_effect(self):
         effect = Chamber.WIND_EFFECT[self.wind[self.wind_index]]
@@ -55,10 +75,9 @@ class Chamber:
     def try_move(self, rock, move):
         old_origin = rock.origin
         rock.origin += move
-        for point in rock.points:
-            if self.outside_chamber(point) or point in self.occupied_spots:
-                rock.origin = old_origin
-                return False
+        if self.outside_chamber(rock) or rock.points & self.occupied_points:
+            rock.origin = old_origin
+            return False
         return True
 
     def drop_rock(self, shape):
@@ -71,11 +90,17 @@ class Chamber:
             # try to fall, stopping if not possible
             stopped = not self.try_move(rock, Point(0, -1))
 
-        self.occupied_spots |= rock.points
-        self.max_height = max(self.max_height, *(point.y + 1 for point in rock.points))
+        self.occupied_points |= rock.points
+        self.max_height = max(self.max_height, rock.top_edge + 1)
 
-    def outside_chamber(self, point):
-        return point.x < 0 or point.x >= Chamber.WIDTH or point.y < 0
+    def outside_chamber(self, rock: Rock):
+        if rock.left_edge < 0:
+            return True
+        if rock.right_edge >= Chamber.WIDTH:
+            return True
+        if rock.bottom_edge < 0:
+            return True
+        return False
 
 
 def read_data(input_file="input.txt"):
